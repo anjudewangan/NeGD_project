@@ -1,0 +1,97 @@
+import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
+import { PieChart } from 'echarts/charts';
+import {
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent
+} from 'echarts/components';
+import * as echarts from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { useAppContext } from 'providers/AppProvider';
+import ReactEchart from 'components/common/ReactEchart';
+
+echarts.use([
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  PieChart,
+  CanvasRenderer,
+  LegendComponent
+]);
+
+const getOptions = getThemeColor => ({
+  color: [
+    getThemeColor('primary'),
+    getThemeColor('danger'),
+    getThemeColor('warning'),
+    getThemeColor('success'),
+    getThemeColor('info'),
+  ],
+  tooltip: {
+    trigger: 'item',
+    padding: [7, 10],
+    backgroundColor: getThemeColor('gray-100'),
+    borderColor: getThemeColor('gray-300'),
+    textStyle: { color: getThemeColor('gray-1100') },
+    borderWidth: 1,
+    transitionDuration: 0,
+    formatter: function (params) {
+      return `<strong>${params.data.name}:</strong> ${params.percent}`;
+    }
+  },
+  legend: { show: false },
+  series: [
+    {
+      name: 'Total',
+      type: 'pie',
+      radius: ['100%', '67%'],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderWidth: 2,
+        borderColor: getThemeColor('gray-100')
+      },
+      label: {
+        show: false
+      },
+      emphasis: {
+        scale: false
+      },
+      labelLine: { show: false },
+      data: [
+        { value: 30, name: 'New' },
+        { value: 60, name: 'Open' },
+        { value: 10, name: 'Pending' },
+        { value: 100, name: 'Closed' },
+        { value: 120, name: 'Escalated' },
+      ]
+    }
+  ]
+});
+
+const MostLeadsChart = () => {
+  const chartRef = useRef(null);
+  const { getThemeColor } = useAppContext();
+
+  return (
+    <div className="position-relative py-2">
+      <ReactEchart
+        ref={chartRef}
+        echarts={echarts}
+        option={getOptions(getThemeColor)}
+        style={{ height: '12.5rem' }}
+      />
+      <div className="position-absolute top-50 start-50 translate-middle text-center">
+        <p className="fs-10 mb-0 text-400 font-sans-serif fw-medium">Total Tickets</p>
+        <p className="fs-6 mb-0 font-sans-serif fw-medium mt-n2">320</p>
+      </div>
+    </div>
+  );
+};
+
+MostLeadsChart.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.array)
+};
+
+export default MostLeadsChart;
